@@ -90,6 +90,18 @@
                 console.debug("Ok, going to sleep...");
                 $scope.focus = "sleep";
             });
+			
+			// Hide everything and "sleep"
+            AnnyangService.addCommand('Photo', function() {
+                console.debug("Ok, going to sleep...");
+                $scope.focus = "sleep";
+            });
+			
+			// Hide everything and "Mirror"
+            AnnyangService.addCommand('Mirror', function() {
+                console.debug("Ok, going to mirror...");
+                $scope.focus = "mirror";
+            });
 
             // Go back to default view
             AnnyangService.addCommand('Wake up', defaultView);
