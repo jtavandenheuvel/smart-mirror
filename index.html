@@ -1,58 +1,37 @@
 <!DOCTYPE html>
 <html ng-app="SmartMirror">
   <head>
+    <meta charset="utf-8">
     <title>Smart Mirror</title>
-
     <!-- Libraries -->
     <script src="js/annyang.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/moment.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.5/angular.min.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.5/angular-animate.min.js"></script>	
-	<script src="http://code.jquery.com/jquery.min.js"></script>
-		
-		
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.5/angular-animate.min.js"></script>
     <!-- App -->
-    <!--<script src="/js/init.js"></script>-->
-	<script src="js/rrule.js"></script>
-    <script src="js/config.js"></script>
+    <script src="config.js"></script>
+    <script src="js/rrule.js"></script>
     <script src="js/app.js"></script>
     <script src="js/annyang-service.js"></script>
-	<script src="js/calendar-service.js"></script>
     <script src="js/weather-service.js"></script>
+    <script src="js/xkcd-service.js"></script>
     <script src="js/map-service.js"></script>
     <script src="js/hue-service.js"></script>
+    <script src="js/giphy-service.js"></script>
     <script src="js/geolocation-service.js"></script>
+    <script src="js/calendar-service.js"></script>
+    <script src="js/traffic-service.js"></script>
     <script src="js/controller.js"></script>
-	<script src="js/xkcd-service.js"></script>
-	<script src="js/dateFormatFilter.js"></script>
-	<script src="js/vegas.js"></script>
-
-	
     <!-- Styles and Resources -->
     <link rel="shortcut icon" href="favicon.ico" />
     <link href='https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,800,700' rel='stylesheet' type='text/css'>
     <link rel="stylesheet" href="css/main.css" />
 	<link rel="stylesheet" href="css/weather-icons.css">
-	<link rel="stylesheet" href="css/vegas.css">
 
   </head>
   <body ng-controller="MirrorCtrl as commands">
-	<!-- Background cover -->
-    <div ng-show="focus == 'sleep'" class="sleep-cover fade" id="banner">
-		<script>
-		$("#example, #banner").vegas({
-			timer: true,
-			slides: [
-				{ src: "img/slide1.jpg" },
-				{ src: "img/slide2.jpg" },
-				{ src: "img/slide3.jpg" },
-				{ src: "img/slide4.jpg" }
-			]
-		});
-		</script>
-	</div>
-    <div ng-show="focus != 'sleep'" class="top">
+    <div class="top">
       <div class="top-left">
         <div class="date grey">{{date | date : 'EEEE, MMMM d yyyy'}}</div>
         <div class="time">{{date | date : 'hh:mm a'}}</div>
@@ -67,7 +46,7 @@
         </ul>
       </div>
       <div class="top-right">
-         <div class="weather">
+        <div class="weather">
           <div class="weather-today">
             <span class="icon dimmed wi {{currentForcast.wi}}"></span>
             <span class="tempreture">{{currentForcast.temperature}}&deg;</span>
@@ -85,15 +64,25 @@
             </div>
           </div>
         </div>
+        <div class="traffic">
+          <div ng-show="!traffic.error" class="traffic-information">
+            <span class="time-to">Time to {{traffic.destination}}:</span>
+            <span ng-show="traffic.hours > 0">{{traffic.hours}} hours and</span>
+            <span>{{traffic.minutes}} minutes</span>
+          </div>
+        </div>
       </div>
     </div>
     <div class="container">
-      <div ng-show="focus != 'sleep'" class="middle-center">
-        <h1>{{complement}}</h1>
+      <div class="middle-center">
+        <h1>{{greeting}}</h1>
         <h3 ng-show="!(user.name === undefined)">{{user.name}}</h3>
         <!-- <div class="listening" ng-show="listening">Ready: {{focus}}</div> -->
-        <div class="map-container animate-grow" ng-show="focus == 'map'">
-          <img class="map animate-grow" ng-src="{{map}}"/>
+        <div class="contents-box map animate-grow" ng-show="focus == 'map'">
+          <img class="contents map animate-grow" ng-src="{{map}}"/>
+        </div>
+        <div class="contents-box gif animate-grow" ng-show="focus == 'gif'">
+          <img class="contents gif animate-grow" ng-src="{{gifimg}}"/>
         </div>
         <div class="xkcd-container animate-grow" ng-show="focus == 'xkcd'">
           <img class="xkcd animate-grow" ng-src="{{xkcd}}"/>
@@ -102,7 +91,7 @@
       <div class="bottom-center">
         <!-- Command list -->
         <div class="commands animate-grow" ng-show="focus == 'commands'">
-           <h2>Available Commands</h2>
+          <h2>Available Commands</h2>
           <dl>
             <dt>What can I say?</dt>
             <dd>Shows a list of voice commands available to you.</dd>
@@ -118,6 +107,8 @@
             <dd>Shows a map of your current city.</dd>
             <dt>Show map of ________</dt>
             <dd>Shows a map of the given location.</dd>
+            <dt>Giphy ________</dt>
+            <dd>Shows a giphy image </dd>
             <dt>Show xkcd</dt>
             <dd>Shows the most recent xkcd comic.</dd>
           </dl>
@@ -142,6 +133,7 @@
       <button ng-click="focus = (focus == 'map')?'default':'map'">Map</button>
       <button ng-click="focus = (focus == 'colors')?'default':'colors'">Colors</button>
       <button ng-click="focus = (focus == 'commands')?'default':'commands'">Commands</button>
+      <button ng-click="focus = (focus == 'gif')?'default':'gif'">Gif</button>
       <button ng-click="debug = false">Close Debug</button>
       <!-- Has results -->
       <div ng-show="commands.results.length > 0">
@@ -155,12 +147,7 @@
         </ul>
       </div>
     </div>
-	
-    
-	
-	 <!-- Mirror cover -->
-    <div ng-show="focus == 'mirror'" class="mirror-cover fade"></div>
-	
-
+    <!-- Sleep cover -->
+    <div ng-show="focus == 'sleep'" class="sleep-cover fade"></div>
   </body>
 </html>

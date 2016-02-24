@@ -6,20 +6,16 @@
 
     service.events = [];
 
-    service.renderAppointments = function() {
-      return loadFile(PERSONAL_CALENDAR);
+    service.getCalendarEvents = function() {
+      service.events = [];
+      return loadFile(config.calendar.icals);
     }
 
     var loadFile = function(urls) {
       var promises = [];
 
       angular.forEach(urls, function(url) {
-        var promise = $http({
-          url: url,
-          method: 'get'
-        });
-
-        promises.push(promise);
+        promises.push($http.get(url));
       });
 
       return $q.all(promises).then(function(data) {
@@ -122,9 +118,8 @@
           }
         }
       }
-      //Run this to finish proccessing our Events.
-      complete(events);
-      return service.events = events;
+      //Add all of the extracted events to the CalendarService
+      service.events.push.apply(service.events, events);
     }
 
     var contains = function(input, obj) {
@@ -150,29 +145,24 @@
         return false;
     }
 
-    var complete = function(events) {
-      //Sort the data so its in date order.
-      events.sort(function(a, b) {
-        return a.start - b.start;
-      });
-    }
-
     service.getEvents = function(events) {
       return service.events;
     }
 
     service.getFutureEvents = function() {
       var future_events = [],
-        current_date = new moment();
+        current_date = new moment(),
+        end_date = new moment().add(config.calendar.maxDays, 'days');
 
       service.events.forEach(function(itm) {
-        //If the event ends after the current time or if there is no end time and the event starts today add it.
-        if ((itm.end != undefined && itm.end.isAfter(current_date)) || itm.start.diff(current_date, 'days') == 0){
+        //If the event started before current time but ends after the current time or
+        // if there is no end time and the event starts between today and the max number of days add it.
+        if ((itm.end != undefined && (itm.end.isAfter(current_date) && itm.start.isBefore(current_date))) || itm.start.isBetween(current_date, end_date)){
             future_events.push(itm);
         }
       });
       future_events = sortAscending(future_events);
-      return future_events.slice(0, 9);
+      return future_events.slice(0, config.calendar.maxResults);
     }
 
     var sortAscending = function(events) {
