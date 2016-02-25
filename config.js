@@ -1,10 +1,10 @@
 var config = {
     // Lenguage for the mirror (currently not implemented)
     lenguage : "en",
-    greeting : ["Hi, sexy!"], // An array of greetings to randomly choose from
+    greeting : ["Hi, sexy!", "Goedemorgen!", "Happy Tuesday!"], // An array of greetings to randomly choose from
     // forcast.io
     forcast : {
-        key : "", // Your forcast.io api key
+        key : "e97f236510e92a312f54b7c432aa5f12", // Your forcast.io api key
         units : "auto" // See forcast.io documentation if you are getting the wrong units
     },
     // Philips Hue
@@ -21,7 +21,7 @@ var config = {
     },
     // Giphy
     giphy: {
-      key : "" // Your Gliphy API key
+      key : "dc6zaTOxFJmzC" // Your Gliphy API key
     },
     traffic: {
       key : "", // Bing Maps API Key

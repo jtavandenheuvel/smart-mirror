@@ -106,8 +106,8 @@
 			
 			// Hide everything and "sleep"
             AnnyangService.addCommand('Photo', function() {
-                console.debug("Ok, going to sleep...");
-                $scope.focus = "sleep";
+                console.debug("Ok, going to photos...");
+                $scope.focus = "photo";
             });
 			
 			// Hide everything and "Mirror"
