@@ -24,10 +24,10 @@ var config = {
       key : "dc6zaTOxFJmzC" // Your Gliphy API key
     },
     traffic: {
-      key : "", // Bing Maps API Key
-      mode : "Driving", // Possibilities: Driving / Transit / Walking
-      origin : "", // Start of your trip. Human readable address.
-      destination : "", // Destination of your trip. Human readable address.
+      key : "ybLTyVQuuybPborWFb1b~HXbbDtMYqCV6EvfHkP7zsQ~AkikrAY-vOcfaVdjN-vQfikxDCjaCNsDIgoXlD2OvppxPi3VzvbAiW7DiNWzq9ou", // Bing Maps API Key
+      mode : "Transit", // Possibilities: Driving / Transit / Walking
+      origin : "Maria Duystlaan, 2612 SR Delft, Nederland", // Start of your trip. Human readable address.
+      destination : "Station Rotterdam Centraal, Nederland", // Destination of your trip. Human readable address.
       name : "work", // Name of your destination ex: "work"
       reload_interval : 5 // Number of minutes the information is refreshed
     }
